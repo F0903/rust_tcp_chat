@@ -11,10 +11,9 @@ impl Inputter for StandardInputter {
 	}
 
 	fn get(&mut self) -> String {
-		let mut strbuf = String::new();
 		let mut lock = self.stdin.lock();
-		lock.read_line(&mut strbuf)
-			.expect("Could not read to string.");
-		strbuf
+		let mut string = String::new();
+		let _ = lock.read_line(&mut string);
+		string
 	}
 }

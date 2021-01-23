@@ -9,6 +9,7 @@ pub struct Client {
 //TODO: implement the log crate
 impl Client {
 	pub fn read<F: Fn(&str)>(&mut self, on_read: F) {
+		//TODO: Make this shit work
 		let mut stream = Vec::<u8>::new();
 		let mut buffer = [0; 1024];
 		while let Ok(_read) = self.stream.read(&mut buffer) {

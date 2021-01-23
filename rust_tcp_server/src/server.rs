@@ -11,8 +11,13 @@ pub struct Server {
 //TODO: implement the log crate
 impl Server {
 	fn send_to_all(&mut self, msg: &str) {
-		self.clients
-			.retain(|mut x| x.write_all(msg.as_bytes()).is_err());
+		self.clients.retain(|mut x| {
+			let ok = x.write_all(msg.as_bytes()).is_ok();
+			if ok {
+				println!("Sent msg to {:?}", x.peer_addr());
+			}
+			ok
+		});
 	}
 
 	fn receive_from_clients(&mut self) {
@@ -32,8 +37,8 @@ impl Server {
 				return true;
 			}
 
-			let received_string =
-				String::from_utf8(received).expect("Could not convert received slice to string.");
+			let received_string = String::from_utf8(received[..total_read].to_vec())
+				.expect("Could not convert received bytes to string.");
 			println!("Received message: {}", &received_string);
 			messages.push(received_string);
 

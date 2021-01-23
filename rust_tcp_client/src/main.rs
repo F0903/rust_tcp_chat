@@ -27,7 +27,7 @@ fn main() {
 				.lock()
 				.unwrap()
 				.deref_mut()
-				.read(|x| println!("{}", x));
+				.read(|x| println!("Received: {}", x));
 		}
 	});
 

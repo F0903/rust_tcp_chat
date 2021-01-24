@@ -27,11 +27,13 @@ fn main() {
 	});
 
 	let read_thread = std::thread::spawn(move || loop {
-		read_client
-			.as_ref()
-			.lock()
-			.unwrap()
-			.read(|x| println!("Received: {}", x));
+		let mut client = read_client.as_ref().lock().unwrap();
+		if let Some((addr, msg)) = client.get_msg() {
+			if addr == client.local_addr() {
+				continue;
+			}
+			println!("[{}]: {}", addr, msg);
+		}
 	});
 
 	input_thread.join().expect("Input thread produced error: ");

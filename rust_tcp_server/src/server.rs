@@ -12,7 +12,14 @@ pub struct Server {
 impl Server {
 	fn send_to_all(&mut self, msg: &str) {
 		self.clients.retain(|mut x| {
-			let ok = x.write_all(msg.as_bytes()).is_ok();
+			let mut to_send = String::new();
+			to_send.insert_str(
+				0,
+				format!("{}|", x.peer_addr().expect("Could not get addr of socket.")).as_str(),
+			);
+			to_send.push_str(msg);
+
+			let ok = x.write_all(to_send.as_bytes()).is_ok();
 			if ok {
 				println!("Sent msg to {:?}", x.peer_addr());
 			}
@@ -29,7 +36,7 @@ impl Server {
 				if read == 0 {
 					return false;
 				}
-				received.extend_from_slice(&buffer);
+				received.extend_from_slice(&buffer[..read]);
 			}
 			if received.is_empty() {
 				return true;

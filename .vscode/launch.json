@@ -7,7 +7,7 @@
 		{
 			"type": "lldb",
 			"request": "launch",
-			"name": "Debug client",
+			"name": "Client",
 			"cargo": {
 				"args": [
 					"build",
@@ -25,49 +25,10 @@
 		{
 			"type": "lldb",
 			"request": "launch",
-			"name": "Unit test client",
-			"cargo": {
-				"args": [
-					"test",
-					"--no-run",
-					"--bin=rust_tcp_client",
-					"--package=rust_tcp_client"
-				],
-				"filter": {
-					"name": "rust_tcp_client",
-					"kind": "bin"
-				}
-			},
-			"args": [],
-			"cwd": "${workspaceFolder}/rust_tcp_client/"
-		},
-
-		{
-			"type": "lldb",
-			"request": "launch",
-			"name": "Debug server",
+			"name": "Server",
 			"cargo": {
 				"args": [
 					"build",
-					"--bin=rust_tcp_server",
-					"--package=rust_tcp_server"
-				],
-				"filter": {
-					"name": "rust_tcp_server",
-					"kind": "bin"
-				}
-			},
-			"args": [],
-			"cwd": "${workspaceFolder}/rust_tcp_server/"
-		},
-		{
-			"type": "lldb",
-			"request": "launch",
-			"name": "Unit test server",
-			"cargo": {
-				"args": [
-					"test",
-					"--no-run",
 					"--bin=rust_tcp_server",
 					"--package=rust_tcp_server"
 				],

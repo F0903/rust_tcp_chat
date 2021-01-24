@@ -1,6 +1,6 @@
 use log::info;
 use std::io::{Read, Write};
-use std::net::TcpStream;
+use std::net::{IpAddr, TcpStream};
 
 pub struct Client {
 	stream: TcpStream,
@@ -8,19 +8,44 @@ pub struct Client {
 
 //TODO: implement the log crate
 impl Client {
-	pub fn read<F: Fn(&str)>(&mut self, on_read: F) {
+	pub fn local_addr(&self) -> IpAddr {
+		self.stream
+			.local_addr()
+			.expect("Could not get local_addr")
+			.ip()
+	}
+
+	pub fn get_msg(&mut self) -> Option<(IpAddr, String)> {
+		let bytes = self.read();
+		if bytes.is_empty() {
+			return None;
+		}
+		let full = std::str::from_utf8(&bytes).expect("Could not convert to str.");
+		let mut split = full.split('|');
+
+		let ip_port = split.next().expect("Could not get next item in split.");
+		let msg = split.next().expect("Could not get next item in split.");
+		Some((
+			ip_port
+				.split(':')
+				.next()
+				.unwrap()
+				.parse::<IpAddr>()
+				.expect("Could not get IpAddr from str"),
+			String::from(msg),
+		))
+	}
+
+	pub fn read(&mut self) -> Vec<u8> {
 		let mut received = Vec::<u8>::new();
 		let mut buffer = [0; 1024];
 		while let Ok(read) = self.stream.read(&mut buffer) {
 			if read < 1 {
 				panic!("Read was less than one.");
 			}
-			received.extend_from_slice(&buffer);
+			received.extend_from_slice(&buffer[..read]);
 		}
-		if received.is_empty() {
-			return;
-		}
-		on_read(std::str::from_utf8(&received).expect("Could not convert to str."));
+		received
 	}
 
 	pub fn write(&mut self, msg: &mut str) -> std::io::Result<()> {

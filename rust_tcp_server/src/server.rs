@@ -25,19 +25,17 @@ impl Server {
 		self.clients.retain(|mut client| {
 			let mut received = Vec::<u8>::new();
 			let mut buffer = [0; 1024];
-			let mut total_read = 0;
 			while let Ok(read) = client.read(&mut buffer) {
 				if read == 0 {
 					return false;
 				}
 				received.extend_from_slice(&buffer);
-				total_read += read;
 			}
-			if total_read < 1 {
+			if received.is_empty() {
 				return true;
 			}
 
-			let received_string = String::from_utf8(received[..total_read].to_vec())
+			let received_string = String::from_utf8(received[..received.len()].to_vec())
 				.expect("Could not convert received bytes to string.");
 			println!("Received message: {}", &received_string);
 			messages.push(received_string);
@@ -55,8 +53,8 @@ impl Server {
 			.expect("Could not set non-blocking.");
 
 		while self.running {
-			if let Ok((sock, _addr)) = self.socket.accept() {
-				println!("Incoming connection from: {}", _addr);
+			if let Ok((sock, addr)) = self.socket.accept() {
+				println!("Incoming connection from: {}", addr);
 				self.clients.push(sock);
 			}
 			self.receive_from_clients();

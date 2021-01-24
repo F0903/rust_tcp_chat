@@ -9,16 +9,18 @@ pub struct Client {
 //TODO: implement the log crate
 impl Client {
 	pub fn read<F: Fn(&str)>(&mut self, on_read: F) {
-		//TODO: Make this shit work
-		let mut stream = Vec::<u8>::new();
+		let mut received = Vec::<u8>::new();
 		let mut buffer = [0; 1024];
-		while let Ok(_read) = self.stream.read(&mut buffer) {
-			stream.extend_from_slice(&buffer);
+		while let Ok(read) = self.stream.read(&mut buffer) {
+			if read < 1 {
+				panic!("Read was less than one.");
+			}
+			received.extend_from_slice(&buffer);
 		}
-		if stream.is_empty() {
+		if received.is_empty() {
 			return;
 		}
-		on_read(std::str::from_utf8(&stream).expect("Could not convert string."));
+		on_read(std::str::from_utf8(&received).expect("Could not convert to str."));
 	}
 
 	pub fn write(&mut self, msg: &mut str) -> std::io::Result<()> {

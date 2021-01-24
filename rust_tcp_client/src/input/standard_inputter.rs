@@ -17,3 +17,10 @@ impl Inputter for StandardInputter {
 		string
 	}
 }
+
+impl StandardInputter {
+	pub fn get_callback<F: FnOnce(&mut str)>(&mut self, on_input: F) {
+		let mut text = self.get();
+		on_input(&mut text);
+	}
+}

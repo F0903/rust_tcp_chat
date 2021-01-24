@@ -3,12 +3,13 @@ mod input;
 
 use input::inputter::Inputter;
 use input::standard_inputter::StandardInputter;
-use log::*;
 use std::sync::{Arc, Mutex};
+
+const SERVER_ADDR: &str = "83.221.156.57:2";
 
 fn main() {
 	let input_client = Arc::new(Mutex::new(
-		client::Client::start().expect("Couldnt start client."),
+		client::Client::start(SERVER_ADDR).expect("Couldnt start client."),
 	));
 	let read_client = input_client.clone();
 
@@ -32,7 +33,7 @@ fn main() {
 			if addr == client.local_addr() {
 				continue;
 			}
-			println!("[{}]: {}", addr, msg);
+			println!("[{}]: {}", addr, msg.replace("\r\n", ""));
 		}
 	});
 

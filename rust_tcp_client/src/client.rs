@@ -1,4 +1,3 @@
-use log::info;
 use std::io::{Read, Write};
 use std::net::{IpAddr, TcpStream};
 
@@ -6,7 +5,6 @@ pub struct Client {
 	stream: TcpStream,
 }
 
-//TODO: implement the log crate
 impl Client {
 	pub fn local_addr(&self) -> IpAddr {
 		self.stream
@@ -57,13 +55,12 @@ impl Client {
 		}
 	}
 
-	pub fn start() -> std::io::Result<Client> {
-		const SERVER_ADDR: &str = "127.0.0.1:2";
-		let stream = TcpStream::connect(SERVER_ADDR)?;
+	pub fn start(server_addr: &str) -> std::io::Result<Client> {
+		let stream = TcpStream::connect(server_addr)?;
 		stream
 			.set_nonblocking(true)
 			.expect("Could not set non_blocking.");
-		println!("Connected to {}", SERVER_ADDR);
+		println!("Connected to {}", server_addr);
 		Ok(Client { stream })
 	}
 }

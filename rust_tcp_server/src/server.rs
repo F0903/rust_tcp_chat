@@ -1,4 +1,3 @@
-use log::*;
 use std::io::{Read, Write};
 use std::net::{TcpListener, TcpStream};
 
@@ -8,7 +7,6 @@ pub struct Server {
 	running: bool,
 }
 
-//TODO: implement the log crate
 impl Server {
 	fn send_to_all(&mut self, msg: &str) {
 		self.clients.retain(|mut x| {

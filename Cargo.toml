@@ -1,0 +1,2 @@
+[workspace]
+members = ["rust_tcp_client", "rust_tcp_server"]

@@ -1,8 +1,10 @@
 mod client;
 mod input;
+mod output;
 
 use input::inputter::Inputter;
 use input::standard_inputter::StandardInputter;
+use output::{outputter::Outputter, standard_outputter::StandardOutputter};
 use std::sync::{Arc, Mutex};
 
 const SERVER_ADDR: &str = "83.221.156.57:2";
@@ -27,13 +29,19 @@ fn main() {
 		}
 	});
 
+	let mut output = StandardOutputter::new();
 	let read_thread = std::thread::spawn(move || loop {
 		let mut client = read_client.as_ref().lock().unwrap();
 		if let Some((client_id, msg)) = client.get_msg() {
-			if client_id == client.id() {
-				continue;
-			}
-			println!("[{}]: {}", client_id, msg.replace(&['\r', '\n'][..], ""));
+			// if client_id == client.id() {
+			// 	continue;
+			// }
+
+			output.writeline(format!(
+				"[{}]: {}",
+				client_id,
+				msg.replace(&['\r', '\n'][..], "")
+			));
 		}
 	});
 

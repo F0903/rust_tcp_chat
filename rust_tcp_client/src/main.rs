@@ -29,11 +29,11 @@ fn main() {
 
 	let read_thread = std::thread::spawn(move || loop {
 		let mut client = read_client.as_ref().lock().unwrap();
-		if let Some((addr, msg)) = client.get_msg() {
-			if addr == client.local_addr() {
+		if let Some((client_id, msg)) = client.get_msg() {
+			if client_id == client.id() {
 				continue;
 			}
-			println!("[{}]: {}", addr, msg.replace("\r\n", ""));
+			println!("[{}]: {}", client_id, msg.replace(&['\r', '\n'][..], ""));
 		}
 	});
 

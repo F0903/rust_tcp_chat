@@ -1,3 +1,5 @@
+pub mod standard_console;
+
 pub trait Outputtable {
 	fn bytes(&self) -> &[u8];
 }
@@ -14,6 +16,6 @@ impl Outputtable for String {
 	}
 }
 
-pub trait Outputter {
+pub trait Console {
 	fn writeline<T: Outputtable + std::borrow::Borrow<T>>(&mut self, msg: T);
 }

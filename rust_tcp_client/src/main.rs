@@ -1,10 +1,7 @@
 mod client;
-mod input;
-mod output;
+mod console;
 
-use input::inputter::Inputter;
-use input::standard_inputter::StandardInputter;
-use output::{outputter::Outputter, standard_outputter::StandardOutputter};
+use console::{standard_console::StandardConsole, Console};
 use std::sync::{Arc, Mutex};
 
 const SERVER_ADDR: &str = "83.221.156.57:2";
@@ -15,29 +12,26 @@ fn main() {
 	));
 	let read_client = input_client.clone();
 
-	let input_thread = std::thread::spawn(move || {
-		let mut inputter = StandardInputter::new();
-		loop {
-			inputter.get_callback(|x| {
-				input_client
-					.as_ref()
-					.lock()
-					.unwrap()
-					.write(x)
-					.expect("Could not write.");
-			});
-		}
-	});
+	let console = Arc::new(Mutex::new(StandardConsole::new(move |mut x| {
+		input_client
+			.as_ref()
+			.lock()
+			.unwrap()
+			.write(&mut x)
+			.expect("Couldn't write to client.")
+	})));
 
-	let mut output = StandardOutputter::new();
-	let read_thread = std::thread::spawn(move || loop {
+	let work_thread = std::thread::spawn(move || loop {
 		let mut client = read_client.as_ref().lock().unwrap();
-		if let Some((client_id, msg)) = client.get_msg() {
-			// if client_id == client.id() {
-			// 	continue;
-			// }
+		let mut cons = console.as_ref().lock().unwrap();
 
-			output.writeline(format!(
+		cons.check_for_input();
+		if let Some((client_id, msg)) = client.get_msg() {
+			/* if client_id == client.id() {
+				continue;
+			} */
+
+			cons.writeline(format!(
 				"[{}]: {}",
 				client_id,
 				msg.replace(&['\r', '\n'][..], "")
@@ -45,6 +39,5 @@ fn main() {
 		}
 	});
 
-	input_thread.join().expect("Input thread produced error: ");
-	read_thread.join().expect("Read thread produced error: ");
+	work_thread.join().expect("Work thread produced error: ");
 }
